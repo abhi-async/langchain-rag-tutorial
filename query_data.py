@@ -1,9 +1,14 @@
 import argparse
+import os
 # from dataclasses import dataclass
 from langchain_community.vectorstores import Chroma
 #from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
 
 CHROMA_PATH = "chroma"
 
@@ -27,11 +32,11 @@ def main():
 
     # Prepare the DB.
     embedding_function = OpenAIEmbeddings(
-                            model="nvidia/nemotron-3-embed-1b:free",
-                            base_url="https://openrouter.ai/api/v1",
-                            #openai_api_key=os.environ["OPENROUTER_API_KEY"],
-                            check_embedding_ctx_length=False,
-                            )
+        model="nvidia/nemotron-3-embed-1b:free",
+        base_url="https://openrouter.ai/api/v1",
+        openai_api_key=os.environ["OPENROUTER_API_KEY"],
+        check_embedding_ctx_length=False,
+    )
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
 
     # Search the DB.
@@ -45,7 +50,11 @@ def main():
     prompt = prompt_template.format(context=context_text, question=query_text)
     print(prompt)
 
-    model = ChatOpenAI()
+    model = ChatOpenAI(
+            model="openrouter/free",
+            base_url="https://openrouter.ai/api/v1",
+            openai_api_key=os.environ["OPENROUTER_API_KEY"],
+        )
     response_text = model.predict(prompt)
 
     sources = [doc.metadata.get("source", None) for doc, _score in results]
