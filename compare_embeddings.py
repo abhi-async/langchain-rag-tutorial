@@ -1,6 +1,6 @@
-from langchain_openai import OpenAIEmbeddings
 from langchain.evaluation import load_evaluator
 from dotenv import load_dotenv
+from local_embeddings import LocalEmbeddings
 import openai
 import os
 
@@ -13,7 +13,7 @@ openai.api_key = os.environ['OPENAI_API_KEY']
 
 def main():
     # Get embedding for a word.
-    embedding_function = OpenAIEmbeddings()
+    embedding_function = LocalEmbeddings()
     vector = embedding_function.embed_query("apple")
     print(f"Vector for 'apple': {vector}")
     print(f"Vector length: {len(vector)}")
