@@ -12,10 +12,6 @@ import shutil
 
 # Load environment variables. Assumes that project contains .env file with API keys
 load_dotenv()
-#---- Set OpenAI API key 
-# Change environment variable name from "OPENAI_API_KEY" to the name given in 
-# your .env file.
-openai.api_key = os.environ['OPENAI_API_KEY']
 
 CHROMA_PATH = "chroma"
 DATA_PATH = "data/books"
@@ -59,9 +55,16 @@ def save_to_chroma(chunks: list[Document]):
     if os.path.exists(CHROMA_PATH):
         shutil.rmtree(CHROMA_PATH)
 
-    # Create a new DB from the documents.
+    # Create a new DB using the free Nemotron embedding model on OpenRouter.
     db = Chroma.from_documents(
-        chunks, OpenAIEmbeddings(), persist_directory=CHROMA_PATH
+        chunks,
+        OpenAIEmbeddings(
+            model="nvidia/nemotron-3-embed-1b:free",
+            base_url="https://openrouter.ai/api/v1",
+            openai_api_key=os.environ["OPENROUTER_API_KEY"],
+            check_embedding_ctx_length=False,
+        ),
+        persist_directory=CHROMA_PATH,
     )
     db.persist()
     print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
