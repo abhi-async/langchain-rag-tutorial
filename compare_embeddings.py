@@ -1,4 +1,4 @@
-from langchain_openai import OpenAIEmbeddings
+#from langchain_openai import OpenAIEmbeddings
 from langchain.evaluation import load_evaluator
 from dotenv import load_dotenv
 import openai
@@ -9,11 +9,16 @@ load_dotenv()
 #---- Set OpenAI API key 
 # Change environment variable name from "OPENAI_API_KEY" to the name given in 
 # your .env file.
-openai.api_key = os.environ['OPENAI_API_KEY']
+openai.api_key = os.environ['OPENROUTER_API_KEY']
 
 def main():
     # Get embedding for a word.
-    embedding_function = OpenAIEmbeddings()
+    embedding_function = OpenAIEmbeddings(
+                            model="nvidia/nemotron-3-embed-1b:free",
+                            base_url="https://openrouter.ai/api/v1",
+                            #openai_api_key=os.environ["OPENROUTER_API_KEY"],
+                            check_embedding_ctx_length=False,
+                            ),
     vector = embedding_function.embed_query("apple")
     print(f"Vector for 'apple': {vector}")
     print(f"Vector length: {len(vector)}")
